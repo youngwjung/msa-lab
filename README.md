@@ -8,7 +8,7 @@
 3. [Lab 환경 구축](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/msa-hol.yml&stackName=msa-lab)
 
 ## Application 실행
-1. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 ssm를 검색하고 **[Systems Manager]** 를 선택
+1. AWS Management Console 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 ssm를 검색하고 **[Systems Manager]** 를 선택
 2. Systems Manager Dashboard 왼쪽 패널 Instances & Nodes 섹션 아래에 있는 **[Session Manager]** 선택
 3. **[Start Session]** &rightarrow; Instance Name: **react-app** 선택 &rightarrow; **[Start Session]** 클릭
   - Root 환경으로 전환
@@ -107,21 +107,21 @@
 10. 좌측 하단에 있는 **[Execution role]** 에서 **View the event_handler-role-xxxx** on the IAM console 를 선택
 
 11. **[Add inline policy]** 선택 후,
-  **Service** = DynamoDB,
-  **Actions** = PutItem,
-  **Resources** = :white_check_mark: Specific &rightarrow; **[Add ARN]**,
-  **Region** = ap-northeast-2, **Table name** = event &rightarrow; **[Add]**,
-  **[Add additional permissions]** 클릭,
-  **Service** = X-ray,
-  **Actions** = :white_check_mark: Write,
-  **Resources** = :white_check_mark: All resources;
-  **[Add additional permissions]** 클릭,
-  **Service** = SES,
-  **Actions** = SendEmail,
-  **Resources** = :white_check_mark: All resources;
-  **[Review policy]** 클릭,
-  **Name** = event_handler,
-  **[Create policy]** 클릭
+    **Service** = DynamoDB,
+    **Actions** = PutItem,
+    **Resources** = :white_check_mark: Specific &rightarrow; **[Add ARN]**,
+    **Region** = ap-northeast-2, **Table name** = event &rightarrow; **[Add]**,
+    **[Add additional permissions]** 클릭,
+    **Service** = X-ray,
+    **Actions** = :white_check_mark: Write,
+    **Resources** = :white_check_mark: All resources;
+    **[Add additional permissions]** 클릭,
+    **Service** = SES,
+    **Actions** = SendEmail,
+    **Resources** = :white_check_mark: All resources;
+    **[Review policy]** 클릭,
+    **Name** = event_handler,
+    **[Create policy]** 클릭
 
 12. Lambda Console로 돌아와서 우측 하단에 있는 **[AWS X-Ray]** 에서 :white_check_mark: **Active tracing** Specific &rightarrow; **[Save]** 클릭
 
@@ -176,11 +176,11 @@
 
 16. **/event_handler** 선택 &rightarrow; Actions &rightarrow; Create Method &rightarrow; POST 선택 &rightarrow; :white_check_mark: &rightarrow; **Integration type** = Lambda Function, **Lambda Region** = ap-northeast-2, **Lambda Function** = event_handler &rightarrow; **[Save]** 클릭
 
-17. **/event_handler** 밑에 **POST** 선택 &rightarrow; Actions &rightarrow; Enable CORS &rightarrow; **[Enable CORS and replace existing CORS headers]** 클릭 &rightarrow; **[Yes, replace existing values]** 클릭
+17. **/event_handler** 밑에 **POST** 선택 &rightarrow; Actions &rightarrow; Enable CORS &rightarrow; **[Enable CORS and replace existing CORS headers]** 클릭 &rightarrow; **[Yes, replace existing values]** 클릭
 
 18. **/event_handler** 선택 &rightarrow; Actions &rightarrow; Deploy API &rightarrow; **Deployment stage** = default &rightarrow; **[Deploy]** 클릭
 
-19. Stages &rightarrow; Default &rightarrow; /event_handler &rightarrow; POST &rightarrow; **[Invoke URL]**를 클립보드에 복사
+19. Stages &rightarrow; Default &rightarrow; /event_handler &rightarrow; POST &rightarrow; **[Invoke_URL]**를 클립보드에 복사
 
 20. Session Manager를 통해서 EC2 인스턴스에 접속후,
   - React App 설정 파일 열기
@@ -324,7 +324,7 @@
 
 ### Event-driven microservice
 
-1. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 Lambda를 검색하거나 **[Compute]** 밑에 있는 **[Lambda를]** 를 선택
+1. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 Lambda를 검색하거나 **[Compute]** 밑에 있는 **[Lambda]** 를 선택
 
 2. Lambda Dashboard에서  **[Create function]** 클릭후,
   **Function name** = send_email,
