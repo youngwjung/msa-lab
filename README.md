@@ -39,13 +39,14 @@
     ```
 
   - **API_SERVER** = http://<EC2_PUBLIC_IP>:5000 로 변경 (EC2 Console에서 확인 가능)
-    ```bash
+    ```javascript
     const API_SERVER = 'http://123.123.123.123:5000'
     ```
 
   - React 빌드 생성
-    ```#!/usr/bin/env bash
+    ```bash
     cd /home/ec2-user/react-ecommerce && yarn build
+    ```
 
   - React 서버 시작
     ```bash
@@ -188,16 +189,19 @@
     ```
 
   - **EVENT_REGISTER**: <API_GATEWAY_INVOKE_URL>로 변경
-    ```#!/usr/bin/env bash
+    ```javascript
     EVENT_REGISTER: `https://xxxxx.execute-api.ap-northeast-2.amazonaws.com/default/event_handler`
+    ```
 
   - React 빌드 생성
-    ```#!/usr/bin/env bash
+    ```bash
     cd /home/ec2-user/react-ecommerce && yarn build
+    ```
 
   - React 서버 시작
-    ```#!/usr/bin/env bash
+    ```bash
     cd /home/ec2-user/react-ecommerce && /usr/local/bin/serve -s build --listen 80
+    ```
 
 21. 웹사이트에 접속후 Event 페이지로 이동 후 폼 작성 및 제출 &rightarrow; DynamoDB 테이블에 Record 추가 됐는지 확인 & 이벤트 접수 메일 왔는지 확인
 
@@ -216,7 +220,7 @@
 4. 해당 Bucket 클릭 &rightarrow; **[Permissions]** &rightarrow; **[Block public access]** &rightarrow; **[Edit]** &rightarrow;  uncheck **Block _all_ public access** &rightarrow; **[Save]**
 
 5. **[Permissions]** &rightarrow; **[Bucket Policy]** &rightarrow; 아래 Policy 블록을 Bucket policy editor에 붙여놓고 **[Save]**
-  ```
+  ```json
   {
     "Version":"2012-10-17",
     "Statement":[
@@ -229,6 +233,7 @@
       }
     ]
   }
+  ```
 
 ### Continuous Deployment
   - React 소스코드를 Github에 호스팅
@@ -242,7 +247,7 @@
 3. **[Create pipeline]** &rightarrow; **Pipeline name** = msa-frontend, **Service role** = New service role &rightarrow; **[Next]** &rightarrow; **Source provider** = GitHub &rightarrow; **[Connect to GitHub]** &rightarrow; **Repository** = Step 1에서 Forking한 Repository, **Branch** = master &rightarrow; **[Next]** &rightarrow; **Build provider** = AWS CodeBuild &rightarrow; **[Create project]**
 
 4. **Project name** = msa-frontend, **Environment image** = Managed Image, **Operating system** = Ubuntu, **Runtime(s)** = Standard, **Image** = aws/codebuild/standard:2.0, **Service role** = New service role, **Build specifications** = Insert build commands &rightarrow; **[Switch to editor]** &rightarrow; 아래 커맨드블록을 Build commands에 붙여놓고 **[Continue to CodePipeline]**
-```
+  ```yaml
   version: 0.2
 
   phases:
@@ -266,6 +271,7 @@
       files:
           - '**/*'
       base-directory: 'build'
+  ``` 
 
 5. **[Next]** &rightarrow; **Deploy provider** = AWS S3, **Bucket** = 바로 전에 생성한 S3 Bucket, :white_check_mark: Extract file before deploy &rightarrow; **[Next]** &rightarrow; **[Create pipeline]**
 
@@ -274,16 +280,18 @@
 7. **[Create environment]** &rightarrow; **Name** = dev &rightarrow; **[Next step]** &rightarrow; **Environment type** = :white_check_mark: Create a new instance for environment (EC2), **Instance type** = t2.micro (1 GiB RAM + 1 vCPU), **Platform** = Amazon Linux &rightarrow; **[Next step]** &rightarrow; **[Create environment]**
 
 8. Forking한 Repository를 Cloud9으로 환경으로 Clone
-  ```
+  ```bash
   git clone http://<REPOSITORY_URL>
+  ```
 
 9. React App 설정파일 수정 (API_SERVER, EVENT_REGISTER)
 
 10. 수정한 코드를 Commit & Push
-  ```
+  ```bash
   git add .
   git commit -m "add API endpoints to config"
   git push
+  ```
 
 ## AppSync
 ![](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/appsync.png)
@@ -295,7 +303,7 @@
 3. **Model Name** = Event &rightarrow; **[Add field]**, **Name** = name, **Type** = String, **Required** = :white_check_mark: &rightarrow; **[Add field]**, **Name** = mobile, **Type** = String, **Required** = :white_check_mark: &rightarrow; **[Create]** &rightarrow; **API Name** = Event &rightarrow; **[Create]**
 
 4. src/index.js 파일을 열고 AppSync Endpoint 정보를 입력, 관련정보는 **[Settings]**에서 확인
-  ```
+  ```javascript
   const client = new AWSAppSyncClient({
     url: 'https://xxxxx.appsync-api.ap-northeast-2.amazonaws.com/graphql',
     region: 'ap-northeast-2',
@@ -304,11 +312,13 @@
       apiKey: 'xxxxxxxxxxxxxxxxxx',
     }
   })
+  ```
 
 5. src/components/event/event.component.jsx 파일을 열고 아래와 같이 35줄을 주석처리하고 36줄의 주석처리를 해제
-  ```
+  ```javascript
   // await events.register(name, email, mobile);
   this.props.onAdd(input);
+  ```
 
 6. 수정한 코드를 Commit & Push
 
@@ -328,7 +338,7 @@
 5. Inline policy를 이용해서 해당 IAM Role에 SES SendEmail 권한 부
 
 6. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
-  ```#!/usr/bin/env bash
+  ```python
   import json
   import boto3
 
@@ -360,6 +370,7 @@
               print (sesResponse)
               print ("email sent")
       return 'OK'
+  ```
 
 7. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 DynamoDB를 검색하거나 **[Database]** 밑에 있는 **[DynamoDB]** 를 선택
 
@@ -382,7 +393,7 @@
 5. 좌측 상단에 있는 **Federated Identities** 선택 &rightarrow; **Identity pool name** = msa app &rightarrow; Authentication providers 탭 펼치기 &rightarrow; Cognito 탭 아래 **User Pool ID** , **App client id** 입력 &rightarrow; **[Create Pool]** &rightarrow; **[Allow]**
 
 6. Cloud9에서 src/config/cognito.js 파일을 열고 Cognito Endpoint 정보를 입력,
-  ```
+  ```javascript
   export default {
     cognito: {
       REGION: "ap-northeast-2",
@@ -391,9 +402,10 @@
       IDENTITY_POOL_ID: "ap-northeast-2:xxxx-xxxx-xxxxxxx"
     }
   };
+  ```
 
 7. Cloud9에서 src/components/sign-up/sign-up.component.jsx 파일을 열고 아래와 같이 38-54줄을 주석처리를 해제하고, 58줄 주석처리, 60줄 주석처리 해제
-  ```
+  ```javascript
   if(showVerification == false) {
 
     const currentUser = await Auth.signUp({
@@ -417,6 +429,7 @@
     // const currentUser = await user.register(email, password);
     // console.log(verificationCode);
     const currentUser = await Auth.confirmSignUp(email, verificationCode)
+  ```
 
 8. 수정한 코드를 Commit & Push
 
@@ -434,17 +447,19 @@
 2. **[Get Started]** &rightarrow; **Repository name** = msa-node &rightarrow; **[Create repository]**
 
 3. Cloud9 에서 Node.js backend repository 복제
-  ```
+  ```bash
   cd ~/environment && git clone https://github.com/woowhoo/react-ecommerce-node.git
+  ```
 
 4. Cloud9에서 react-ecommerce-node/config.js 파일을 열고 **DB_URL** = <RDS_ENDPOINT> 로 변경 (RDS Console에서 확인 가능)
-  ```#!/usr/bin/env bash
+  ```javascript
   module.exports = {
     DB_URL: 'react-mysql.xxxxxxxx.ap-northeast-2.rds.amazonaws.com'
   };
+  ```
 
 5. 복제한 Repository 루트 디렉토리에 Dockerfile 파일 생성후 아래 내용 복사
-  ```
+  ```docker
   FROM node:10
 
   # Create app directory
@@ -455,6 +470,7 @@
 
   EXPOSE 5000
   CMD [ "node", "app.js" ]
+  ```
 
 6. ECR Dashboard 에서 위에서 만든 Repository 선택 &rightarrow; 우측 상단에 있는 **[View push commands]** 클릭
 
@@ -493,8 +509,9 @@
 10. Task ID 클릭 &rightarrow; **Public IP**를 클립보드에 복사
 
 11. Cloud9 에서 React App 설정파일 수정 (API_SERVER)
-  ```
+  ```javascript
   const API_SERVER = 'http://<Public_IP>:5000'
+  ```
 
 12. 수정한 코드를 Commit & Push
 
