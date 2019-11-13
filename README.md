@@ -17,34 +17,40 @@
     ```
 
   - Node.js App 설정 파일 열기
-    ```#!/usr/bin/env bash
+    ```bash
     vi /home/ec2-user/react-ecommerce-node/config.js
+    ```
 
   - **DB_URL** = <RDS_ENDPOINT> 로 변경 (RDS Console에서 확인 가능)
-    ```#!/usr/bin/env bash
+    ```bash
     module.exports = {
       DB_URL: 'react-mysql.xxxxxxxx.ap-northeast-2.rds.amazonaws.com'
     };
+    ```
 
   - Node.js 서버 시작
-    ```#!/usr/bin/env bash
+    ```bash
     forever start /home/ec2-user/react-ecommerce-node/app.js
+    ```
 
   - React App 설정 파일 열기
-    ```#!/usr/bin/env bash
+    ```bash
     vi /home/ec2-user/react-ecommerce/src/config/config.js
+    ```
 
   - **API_SERVER** = http://<EC2_PUBLIC_IP>:5000 로 변경 (EC2 Console에서 확인 가능)
-    ```#!/usr/bin/env bash
+    ```bash
     const API_SERVER = 'http://123.123.123.123:5000'
+    ```
 
   - React 빌드 생성
     ```#!/usr/bin/env bash
     cd /home/ec2-user/react-ecommerce && yarn build
 
   - React 서버 시작
-    ```#!/usr/bin/env bash
+    ```bash
     cd /home/ec2-user/react-ecommerce && /usr/local/bin/serve -s build --listen 80
+    ```
 
 ## Serverless backend
 ![](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/serverless_diagram.png)
@@ -119,7 +125,7 @@
 12. Lambda Console로 돌아와서 우측 하단에 있는 **[AWS X-Ray]** 에서 :white_check_mark: **Active tracing** Specific &rightarrow; **[Save]** 클릭
 
 13. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
-  ```#!/usr/bin/env bash
+  ```python
   import json
   import boto3
 
@@ -161,6 +167,7 @@
           'statusCode': 200,
           'body': json.dumps(response)
       }
+  ```
 
 14. Lambda Console로 돌아가서 **[Designer]** 섹션에 있는 **+ Add trigger** 클릭 &rightarrow; Dropdown 리스트에서 **API Gateway** 선택 &rightarrow; **API** = Create a new API, **Security** = Open &rightarrow; **[Add]** 클릭
 
@@ -176,8 +183,9 @@
 
 20. Session Manager를 통해서 EC2 인스턴스에 접속후,
   - React App 설정 파일 열기
-    ```#!/usr/bin/env bash
+    ```bash
     vi /home/ec2-user/react-ecommerce/src/config/config.js
+    ```
 
   - **EVENT_REGISTER**: <API_GATEWAY_INVOKE_URL>로 변경
     ```#!/usr/bin/env bash
