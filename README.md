@@ -12,8 +12,9 @@
 2. Systems Manager Dashboard 왼쪽 패널 Instances & Nodes 섹션 아래에 있는 **[Session Manager]** 선택
 3. **[Start Session]** &rightarrow; Instance Name: **react-app** 선택 &rightarrow; **[Start Session]** 클릭
   - Root 환경으로 전환
-    ```
+    ```bash
     sudo -i
+    ```
 
   - Node.js App 설정 파일 열기
     ```#!/usr/bin/env bash
