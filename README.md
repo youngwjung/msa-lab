@@ -22,7 +22,7 @@
     ```
 
   - **DB_URL** = <RDS_ENDPOINT> 로 변경 (RDS Console에서 확인 가능)
-    ```bash
+    ```javascript
     module.exports = {
       DB_URL: 'react-mysql.xxxxxxxx.ap-northeast-2.rds.amazonaws.com'
     };
