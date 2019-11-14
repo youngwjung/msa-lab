@@ -107,21 +107,21 @@
 10. 좌측 하단에 있는 **[Execution role]** 에서 **View the event_handler-role-xxxx** on the IAM console 를 선택
 
 11. **[Add inline policy]** 선택 후,
-    **Service** = DynamoDB,
-    **Actions** = PutItem,
-    **Resources** = :white_check_mark: Specific &rightarrow; **[Add ARN]**,
-    **Region** = ap-northeast-2, **Table name** = event &rightarrow; **[Add]**,
-    **[Add additional permissions]** 클릭,
-    **Service** = X-ray,
-    **Actions** = :white_check_mark: Write,
-    **Resources** = :white_check_mark: All resources;
-    **[Add additional permissions]** 클릭,
-    **Service** = SES,
-    **Actions** = SendEmail,
-    **Resources** = :white_check_mark: All resources;
-    **[Review policy]** 클릭,
-    **Name** = event_handler,
-    **[Create policy]** 클릭
+	**Service** = DynamoDB,
+	**Actions** = PutItem,
+	**Resources** = :white_check_mark: Specific &rightarrow; **[Add ARN]**,
+	**Region** = ap-northeast-2, **Table name** = event &rightarrow; **[Add]**,
+	**[Add additional permissions]** 클릭,
+	**Service** = X-ray,
+	**Actions** = :white_check_mark: Write,
+	**Resources** = :white_check_mark: All resources;
+	**[Add additional permissions]** 클릭,
+	**Service** = SES,
+	**Actions** = SendEmail,
+	**Resources** = :white_check_mark: All resources;
+	**[Review policy]** 클릭,
+	**Name** = event_handler,
+	**[Create policy]** 클릭
 
 12. Lambda Console로 돌아와서 우측 하단에 있는 **[AWS X-Ray]** 에서 :white_check_mark: **Active tracing** Specific &rightarrow; **[Save]** 클릭
 
@@ -335,7 +335,7 @@
 
 4. **[Attach policies]** &rightarrow; DynamoDB 검색 &rightarrow; :white_check_mark: **AWSLambdaInvocation-DynamoDB** 선택 &rightarrow; **[Attach policy]**
 
-5. Inline policy를 이용해서 해당 IAM Role에 SES SendEmail 권한 부
+5. Inline policy를 이용해서 해당 IAM Role에 SES SendEmail 권한 부여
 
 6. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
   ```python
