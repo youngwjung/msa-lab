@@ -275,7 +275,7 @@
 
 5. **[Next]** &rightarrow; **Deploy provider** = AWS S3, **Bucket** = 바로 전에 생성한 S3 Bucket, :white_check_mark: Extract file before deploy &rightarrow; **[Next]** &rightarrow; **[Create pipeline]**
 
-6. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 Cloud9를 검색하거나 **[Developer Tools]** 밑에 있는 **[Cloud9]**를 선택 &rightarrow; Asia Pacific (Tokyo) 선택
+6. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 Cloud9를 검색하거나 **[Developer Tools]** 밑에 있는 **[Cloud9]** 를 선택 &rightarrow; Asia Pacific (Tokyo) 선택
 
 7. **[Create environment]** &rightarrow; **Name** = dev &rightarrow; **[Next step]** &rightarrow; **Environment type** = :white_check_mark: Create a new instance for environment (EC2), **Instance type** = t2.micro (1 GiB RAM + 1 vCPU), **Platform** = Amazon Linux &rightarrow; **[Next step]** &rightarrow; **[Create environment]**
 
