@@ -91,22 +91,16 @@
 
 6. SES Console에서 인증받은 이메일의 Verification Status가 **verified**로 변경되었는지 확인
 
-7. DynamoDB Dashboard에서  **[Create table]** 클릭후,
-  **Table name** = event,
-  **Primary key** = email,
-  **Use default settings** = :white_check_mark:,
-  **[Create]** 클릭
+7. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 Lambda를 검색하거나 **[Compute]** 밑에 있는 **[Lambda를]** 를 선택
 
-8. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 Lambda를 검색하거나 **[Compute]** 밑에 있는 **[Lambda를]** 를 선택
-
-9. Lambda Dashboard에서  **[Create function]** 클릭후,
+8. Lambda Dashboard에서  **[Create function]** 클릭후,
   **Function name** = event_handler,
   **Runtime** = Python 3.7,
   **[Create function]** 클릭
 
-10. 좌측 하단에 있는 **[Execution role]** 에서 **View the event_handler-role-xxxx** on the IAM console 를 선택
+9. 좌측 하단에 있는 **[Execution role]** 에서 **View the event_handler-role-xxxx** on the IAM console 를 선택
 
-11. **[Add inline policy]** 선택 후,
+10. **[Add inline policy]** 선택 후,
 	**Service** = DynamoDB,
 	**Actions** = PutItem,
 	**Resources** = :white_check_mark: Specific &rightarrow; **[Add ARN]**,
@@ -123,9 +117,9 @@
 	**Name** = event_handler,
 	**[Create policy]** 클릭
 
-12. Lambda Console로 돌아와서 우측 하단에 있는 **[AWS X-Ray]** 에서 :white_check_mark: **Active tracing** Specific &rightarrow; **[Save]** 클릭
+11. Lambda Console로 돌아와서 우측 하단에 있는 **[AWS X-Ray]** 에서 :white_check_mark: **Active tracing** Specific &rightarrow; **[Save]** 클릭
 
-13. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
+12. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
   ```python
   import json
   import boto3
@@ -170,19 +164,19 @@
       }
   ```
 
-14. Lambda Console로 돌아가서 **[Designer]** 섹션에 있는 **+ Add trigger** 클릭 &rightarrow; Dropdown 리스트에서 **API Gateway** 선택 &rightarrow; **API** = Create a new API, **Security** = Open &rightarrow; **[Add]** 클릭
+13. Lambda Console로 돌아가서 **[Designer]** 섹션에 있는 **+ Add trigger** 클릭 &rightarrow; Dropdown 리스트에서 **API Gateway** 선택 &rightarrow; **API** = Create a new API, **Security** = Open &rightarrow; **[Add]** 클릭
 
-15. Lambda Console의  **[API Gateway]** 섹션에서 **event_handler-API** 클릭
+14. Lambda Console의  **[API Gateway]** 섹션에서 **event_handler-API** 클릭
 
-16. **/event_handler** 선택 &rightarrow; Actions &rightarrow; Create Method &rightarrow; POST 선택 &rightarrow; :white_check_mark: &rightarrow; **Integration type** = Lambda Function, **Lambda Region** = ap-northeast-2, **Lambda Function** = event_handler &rightarrow; **[Save]** 클릭
+15. **/event_handler** 선택 &rightarrow; Actions &rightarrow; Create Method &rightarrow; POST 선택 &rightarrow; :white_check_mark: &rightarrow; **Integration type** = Lambda Function, **Lambda Region** = ap-northeast-2, **Lambda Function** = event_handler &rightarrow; **[Save]** 클릭
 
-17. **/event_handler** 밑에 **POST** 선택 &rightarrow; Actions &rightarrow; Enable CORS &rightarrow; **[Enable CORS and replace existing CORS headers]** 클릭 &rightarrow; **[Yes, replace existing values]** 클릭
+16. **/event_handler** 밑에 **POST** 선택 &rightarrow; Actions &rightarrow; Enable CORS &rightarrow; **[Enable CORS and replace existing CORS headers]** 클릭 &rightarrow; **[Yes, replace existing values]** 클릭
 
-18. **/event_handler** 선택 &rightarrow; Actions &rightarrow; Deploy API &rightarrow; **Deployment stage** = default &rightarrow; **[Deploy]** 클릭
+17. **/event_handler** 선택 &rightarrow; Actions &rightarrow; Deploy API &rightarrow; **Deployment stage** = default &rightarrow; **[Deploy]** 클릭
 
-19. Stages &rightarrow; Default &rightarrow; /event_handler &rightarrow; POST &rightarrow; **[Invoke_URL]**를 클립보드에 복사
+18. Stages &rightarrow; Default &rightarrow; /event_handler &rightarrow; POST &rightarrow; **[Invoke_URL]**를 클립보드에 복사
 
-20. Session Manager를 통해서 EC2 인스턴스에 접속후,
+19. Session Manager를 통해서 EC2 인스턴스에 접속후,
   - React App 설정 파일 열기
     ```bash
     vi /home/ec2-user/react-ecommerce/src/config/config.js
@@ -203,7 +197,7 @@
     cd /home/ec2-user/react-ecommerce && /usr/local/bin/serve -s build --listen 80
     ```
 
-21. 웹사이트에 접속후 Event 페이지로 이동 후 폼 작성 및 제출 &rightarrow; DynamoDB 테이블에 Record 추가 됐는지 확인 & 이벤트 접수 메일 왔는지 확인
+20. 웹사이트에 접속후 Event 페이지로 이동 후 폼 작성 및 제출 &rightarrow; DynamoDB 테이블에 Record 추가 됐는지 확인 & 이벤트 접수 메일 왔는지 확인
 
 ## Scalable Frontend
 ### Static Website Hosting on S3
