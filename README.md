@@ -1,62 +1,79 @@
 # MSA 맛보기
+
 ## Architecture Overview
+
 ![dsfdsfsdfsdf](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/msa-101-architecture.png)
 
 ## 시작하기전에
+
 1. 본 Hands-on lab은 AWS Seoul region 기준으로 작성되었습니다. Region을 Seoul (ap-northeast-2)로 변경 후 진행 부탁드립니다.
 2. [AWS Credit 추가하기](https://aws.amazon.com/ko/premiumsupport/knowledge-center/add-aws-promotional-code/)
 3. [Lab 환경 구축](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/msa-hol.yml&stackName=msa-lab)
 
 ## Application 실행
+
 1. AWS Management Console 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 ssm를 검색하고 **[Systems Manager]** 를 선택
+
 2. Systems Manager Dashboard 왼쪽 패널 Instances & Nodes 섹션 아래에 있는 **[Session Manager]** 선택
+
 3. **[Start Session]** &rightarrow; Instance Name: **react-app** 선택 &rightarrow; **[Start Session]** 클릭
-  - Root 환경으로 전환
-    ```bash
-    sudo -i
-    ```
 
-  - Node.js App 설정 파일 열기
-    ```bash
-    vi /home/ec2-user/react-ecommerce-node/config.js
-    ```
+    - Root 환경으로 전환
 
-  - **DB_URL** = <RDS_ENDPOINT> 로 변경 (RDS Console에서 확인 가능)
-    ```javascript
-    module.exports = {
-      DB_URL: 'react-mysql.xxxxxxxx.ap-northeast-2.rds.amazonaws.com'
-    };
-    ```
+      ```bash
+      sudo -i
+      ```
 
-  - Node.js 서버 시작
-    ```bash
-    forever start /home/ec2-user/react-ecommerce-node/app.js
-    ```
+    - Node.js App 설정 파일 열기
 
-  - React App 설정 파일 열기
-    ```bash
-    vi /home/ec2-user/react-ecommerce/src/config/config.js
-    ```
+      ```bash
+      vi /home/ec2-user/react-ecommerce-node/config.js
+      ```
 
-  - **API_SERVER** = http://<EC2_PUBLIC_IP>:5000 로 변경 (EC2 Console에서 확인 가능)
-    ```javascript
-    const API_SERVER = 'http://123.123.123.123:5000'
-    ```
+    - **DB_URL** = <RDS_ENDPOINT> 로 변경 (RDS Console에서 확인 가능)
 
-  - React 빌드 생성
-    ```bash
-    cd /home/ec2-user/react-ecommerce && yarn build
-    ```
+      ```javascript
+      module.exports = {
+        DB_URL: 'react-mysql.xxxxxxxx.ap-northeast-2.rds.amazonaws.com'
+      };
+      ```
 
-  - React 서버 시작
-    ```bash
-    cd /home/ec2-user/react-ecommerce && /usr/local/bin/serve -s build --listen 80
-    ```
+    - Node.js 서버 시작
+
+      ```bash
+      forever start /home/ec2-user/react-ecommerce-node/app.js
+      ```
+
+    - React App 설정 파일 열기
+
+      ```bash
+      vi /home/ec2-user/react-ecommerce/src/config/config.js
+      ```
+
+    - **API_SERVER** = `http://<EC2_PUBLIC_IP>:5000` 로 변경 (EC2 Console에서 확인 가능)
+
+      ```javascript
+      const API_SERVER = 'http://123.123.123.123:5000'
+      ```
+
+    - React 빌드 생성
+
+      ```bash
+      cd /home/ec2-user/react-ecommerce && yarn build
+      ```
+
+    - React 서버 시작
+
+      ```bash
+      cd /home/ec2-user/react-ecommerce && /usr/local/bin/serve -s build --listen 80
+      ```
 
 ## Serverless backend
-![](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/serverless_diagram.png)
+
+![Serverless backend architecture](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/serverless_diagram.png)
 
 ### Lambda
+
 - 이벤트에 대한 응답으로 코드를 실행하고 자동으로 기본 컴퓨팅 리소스를 관리하는 서버리스 컴퓨팅
 - Java, Python, Node.js, C#, Go, Ruby
 - 완전 관리형 서비스 (서버와 운영체제 유지 관리, Capacity Provisioning & Autoscaling, 로깅 및 모니터링, 보안패치 및 코드배포 등등)
@@ -64,11 +81,13 @@
 - HTTP request handler: API Gateway, Application Load Balancer
 
 ### API Gateway
+
 - API를 생성, 게시, 유지관리 및 모니터링 할수있는 완전관리형 서비스
 - REST 및 WebSocket API 지원
 - Integrated with IAM, Cognito, CloudFront, etc
 
 ### DynamoDB
+
 - NoSQL Database
 - Single-digit millisecond performance at any scale
 - Support in-memory cache, global replication, point-in-time recovery
@@ -100,34 +119,34 @@
 
 9. 좌측 하단에 있는 **[Execution role]** 에서 **View the event_handler-role-xxxx** on the IAM console 를 선택
 
-10. **[Add inline policy]** 선택 후,
-	**Service** = DynamoDB,
-	**Actions** = PutItem,
-	**Resources** = :white_check_mark: Specific &rightarrow; **[Add ARN]**,
-	**Region** = ap-northeast-2, **Table name** = event &rightarrow; **[Add]**,
-	**[Add additional permissions]** 클릭,
-	**Service** = X-ray,
-	**Actions** = :white_check_mark: Write,
-	**Resources** = :white_check_mark: All resources;
-	**[Add additional permissions]** 클릭,
-	**Service** = SES,
-	**Actions** = SendEmail,
-	**Resources** = :white_check_mark: All resources;
-	**[Review policy]** 클릭,
-	**Name** = event_handler,
-	**[Create policy]** 클릭
+10. **[Add inline policy]** 선택 후,\
+    **Service** = DynamoDB,\
+    **Actions** = PutItem,\
+    **Resources** = :white_check_mark: Specific &rightarrow; **[Add ARN]**,\
+    **Region** = ap-northeast-2, **Table name** = event &rightarrow; **[Add]**,\
+    **[Add additional permissions]** 클릭,\
+    **Service** = X-ray,\
+    **Actions** = :white_check_mark: Write,\
+    **Resources** = :white_check_mark: All resources;\
+    **[Add additional permissions]** 클릭,\
+    **Service** = SES,\
+    **Actions** = SendEmail,\
+    **Resources** = :white_check_mark: All resources;\
+    **[Review policy]** 클릭,\
+    **Name** = event_handler,\
+    **[Create policy]** 클릭\
 
 11. Lambda Console로 돌아와서 우측 하단에 있는 **[AWS X-Ray]** 에서 :white_check_mark: **Active tracing** Specific &rightarrow; **[Save]** 클릭
 
 12. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
 
-    ```java
+    ```javascript
     var AWS = require('aws-sdk')
 
     exports.handler = function(event, context, callback) {
-        
+
         var dynamodb = new AWS.DynamoDB()
-        
+
         var dynamodbParams = {
             Item: {
                 'email': {
@@ -139,16 +158,16 @@
                 'mobile': {
                     S: event.mobile
                 }
-            }, 
+            },
             TableName: 'event'
         }
-        
+
         dynamodb.putItem(dynamodbParams, function(err, data) {
             if (err) {
                 console.log(err, err.stack)
             } else {
                 var ses = new AWS.SES({region: 'ap-southeast-2'})
-                
+
                 var sesParams = {
                     Destination: {
                         ToAddresses: [event['email']],
@@ -167,22 +186,22 @@
                     },
                     Source: event['email'],
                 }
-                
+
                 ses.sendEmail(sesParams, function(err, data) {
                     if (err) {
                         console.log(err, err.stack)
                     } else {
-                        console.log(data)       
+                        console.log(data)
                     }
                 })
             }
         })
-        
+
         const response = {
             statusCode: 200,
             body: JSON.stringify('OK'),
         }
-        
+
         callback(null, response)
     }
     ```
@@ -200,31 +219,36 @@
 18. Stages &rightarrow; Default &rightarrow; /event_handler &rightarrow; POST &rightarrow; **[Invoke_URL]**를 클립보드에 복사
 
 19. Session Manager를 통해서 EC2 인스턴스에 접속후,
-  - React App 설정 파일 열기
-    ```bash
-    vi /home/ec2-user/react-ecommerce/src/config/config.js
-    ```
 
-  - **EVENT_REGISTER**: <API_GATEWAY_INVOKE_URL>로 변경
-    ```javascript
-    EVENT_REGISTER: `https://xxxxx.execute-api.ap-northeast-2.amazonaws.com/default/event_handler`
-    ```
+    - React App 설정 파일 열기
 
-  - React 빌드 생성
-    ```bash
-    cd /home/ec2-user/react-ecommerce && yarn build
-    ```
+      ```bash
+      vi /home/ec2-user/react-ecommerce/src/config/config.js
+      ```
 
-  - React 서버 시작
-    ```bash
-    cd /home/ec2-user/react-ecommerce && /usr/local/bin/serve -s build --listen 80
-    ```
+    - **EVENT_REGISTER**: <API_GATEWAY_INVOKE_URL>로 변경
+
+      ```javascript
+      EVENT_REGISTER: `https://xxxxx.execute-api.ap-northeast-2.amazonaws.com/default/event_handler`
+      ```
+
+    - React 빌드 생성
+
+      ```bash
+      cd /home/ec2-user/react-ecommerce && yarn build
+      ```
+
+    - React 서버 시작
+
+      ```bash
+      cd /home/ec2-user/react-ecommerce && /usr/local/bin/serve -s build --listen 80
+      ```
 
 20. 웹사이트에 접속후 Event 페이지로 이동 후 폼 작성 및 제출 &rightarrow; DynamoDB 테이블에 Record 추가 됐는지 확인 & 이벤트 접수 메일 왔는지 확인
 
 ### X-Ray 구성
 
-1. Lambda Dashboard에서 **Layers** 클릭 &rightarrow; **[Create layer]** &rightarrow; **Name** = nodejs-xray-sdk, :radio_button: Upload a file from Amazon S3, Amazon S3 link URL = https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/node-xray-sdk.zip, Compatible runtimes = Node.js 10.x, Node.js 12.x &rightarrow; **[Create]**
+1. Lambda Dashboard에서 **Layers** 클릭 &rightarrow; **[Create layer]** &rightarrow; **Name** = nodejs-xray-sdk, :radio_button: Upload a file from Amazon S3, Amazon S3 link URL = `https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/node-xray-sdk.zip` Compatible runtimes = Node.js 10.x, Node.js 12.x &rightarrow; **[Create]**
 
     - Layer 파일 생성 방법
 
@@ -257,10 +281,12 @@
 7. **[Traces]** &rightarrow; **Trace list**에서 Trace를 선택하고 Segment별 실행시간 확인
 
 ## Scalable Frontend
+
 ### Static Website Hosting on S3
-  - HTML, CSS, Javascript 및 기타 정적(Image, text) 파일로 구성된 정적 사이트 호스팅
-  - Route53와 연계해서 Custom Domain으로 연결 가능
-  - Highly available & scalable Serverless Frontend 구성
+
+- HTML, CSS, Javascript 및 기타 정적(Image, text) 파일로 구성된 정적 사이트 호스팅
+- Route53와 연계해서 Custom Domain으로 연결 가능
+- Highly available & scalable Serverless Frontend 구성
 
 1. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 S3를 검색하거나 **[Storage]** 바로 밑에 있는 **[S3]** 를 선택
 
@@ -271,25 +297,27 @@
 4. 해당 Bucket 클릭 &rightarrow; **[Permissions]** &rightarrow; **[Block public access]** &rightarrow; **[Edit]** &rightarrow;  uncheck **Block _all_ public access** &rightarrow; **[Save]**
 
 5. **[Permissions]** &rightarrow; **[Bucket Policy]** &rightarrow; 아래 Policy 블록을 Bucket policy editor에 붙여놓고 **[Save]**
-  ```json
-  {
-    "Version":"2012-10-17",
-    "Statement":[
-      {
-        "Sid":"AddPerm",
-        "Effect":"Allow",
-        "Principal": "*",
-        "Action":["s3:GetObject"],
-        "Resource":["arn:aws:s3:::<BUCKET_NAME>/*"]
-      }
-    ]
-  }
-  ```
+
+    ```json
+    {
+      "Version":"2012-10-17",
+      "Statement":[
+        {
+          "Sid":"AddPerm",
+          "Effect":"Allow",
+          "Principal": "*",
+          "Action":["s3:GetObject"],
+          "Resource":["arn:aws:s3:::<BUCKET_NAME>/*"]
+        }
+      ]
+    }
+    ```
 
 ### Continuous Deployment
-  - React 소스코드를 Github에 호스팅
-  - AWS CodePipeline을 이용해서 코드 변경시 배포 자동화 구성
-  - AWS Cloud9을 이용해서 개발환경 구성
+
+- React 소스코드를 Github에 호스팅
+- AWS CodePipeline을 이용해서 코드 변경시 배포 자동화 구성
+- AWS Cloud9을 이용해서 개발환경 구성
 
 1. 해당 [Git Repository](https://github.com/woowhoo/react-ecommerce)를 Fork (GitHub 계정 필수)
 
@@ -298,31 +326,32 @@
 3. **[Create pipeline]** &rightarrow; **Pipeline name** = msa-frontend, **Service role** = New service role &rightarrow; **[Next]** &rightarrow; **Source provider** = GitHub &rightarrow; **[Connect to GitHub]** &rightarrow; **Repository** = Step 1에서 Forking한 Repository, **Branch** = master &rightarrow; **[Next]** &rightarrow; **Build provider** = AWS CodeBuild &rightarrow; **[Create project]**
 
 4. **Project name** = msa-frontend, **Environment image** = Managed Image, **Operating system** = Ubuntu, **Runtime(s)** = Standard, **Image** = aws/codebuild/standard:2.0, **Service role** = New service role, **Build specifications** = Insert build commands &rightarrow; **[Switch to editor]** &rightarrow; 아래 커맨드블록을 Build commands에 붙여놓고 **[Continue to CodePipeline]**
-  ```yaml
-  version: 0.2
 
-  phases:
-      install:
-          runtime-versions:
-              nodejs: 10
-          commands:
-              # Yarn installation
-              - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
-              - echo "deb http://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
-              - apt-get -y update
-              - apt-get install -y yarn
-              # Installing react and serverless dependencies
-              - yarn install
+    ```yaml
+    version: 0.2
 
-      build:
-          commands:
-              - yarn run build
+    phases:
+        install:
+            runtime-versions:
+                nodejs: 10
+            commands:
+                # Yarn installation
+                - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+                - echo "deb http://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+                - apt-get -y update
+                - apt-get install -y yarn
+                # Installing react and serverless dependencies
+                - yarn install
 
-  artifacts:
-      files:
-          - '**/*'
-      base-directory: 'build'
-  ``` 
+        build:
+            commands:
+                - yarn run build
+
+    artifacts:
+        files:
+            - '**/*'
+        base-directory: 'build'
+    ```
 
 5. **[Next]** &rightarrow; **Deploy provider** = AWS S3, **Bucket** = 바로 전에 생성한 S3 Bucket, :white_check_mark: Extract file before deploy &rightarrow; **[Next]** &rightarrow; **[Create pipeline]**
 
@@ -331,21 +360,24 @@
 7. **[Create environment]** &rightarrow; **Name** = dev &rightarrow; **[Next step]** &rightarrow; **Environment type** = :white_check_mark: Create a new instance for environment (EC2), **Instance type** = t2.micro (1 GiB RAM + 1 vCPU), **Platform** = Amazon Linux &rightarrow; **[Next step]** &rightarrow; **[Create environment]**
 
 8. Forking한 Repository를 Cloud9으로 환경으로 Clone
-  ```bash
-  git clone http://<REPOSITORY_URL>
-  ```
+
+    ```bash
+    git clone http://<REPOSITORY_URL>
+    ```
 
 9. React App 설정파일 수정 (API_SERVER, EVENT_REGISTER)
 
 10. 수정한 코드를 Commit & Push
-  ```bash
-  git add .
-  git commit -m "add API endpoints to config"
-  git push
-  ```
+
+    ```bash
+    git add .
+    git commit -m "add API endpoints to config"
+    git push
+    ```
 
 ## AppSync
-![](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/appsync.png)
+
+![AppSync](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/appsync.png)
 
 1. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 AppSync를 검색하거나 **[Mobile]** 밑에 있는 **[AWS AppSync]**를 선택
 
@@ -354,22 +386,24 @@
 3. **Model Name** = Event &rightarrow; **[Add field]**, **Name** = name, **Type** = String, **Required** = :white_check_mark: &rightarrow; **[Add field]**, **Name** = mobile, **Type** = String, **Required** = :white_check_mark: &rightarrow; **[Create]** &rightarrow; **API Name** = Event &rightarrow; **[Create]**
 
 4. src/index.js 파일을 열고 AppSync Endpoint 정보를 입력, 관련정보는 **[Settings]**에서 확인
-  ```javascript
-  const client = new AWSAppSyncClient({
-    url: 'https://xxxxx.appsync-api.ap-northeast-2.amazonaws.com/graphql',
-    region: 'ap-northeast-2',
-    auth: {
-      type: 'API_KEY',
-      apiKey: 'xxxxxxxxxxxxxxxxxx',
-    }
-  })
-  ```
+
+    ```javascript
+    const client = new AWSAppSyncClient({
+      url: 'https://xxxxx.appsync-api.ap-northeast-2.amazonaws.com/graphql',
+      region: 'ap-northeast-2',
+      auth: {
+        type: 'API_KEY',
+        apiKey: 'xxxxxxxxxxxxxxxxxx',
+      }
+    })
+    ```
 
 5. src/components/event/event.component.jsx 파일을 열고 아래와 같이 35줄을 주석처리하고 36줄의 주석처리를 해제
-  ```javascript
-  // await events.register(name, email, mobile);
-  this.props.onAdd(input);
-  ```
+
+    ```javascript
+    // await events.register(name, email, mobile);
+    this.props.onAdd(input);
+    ```
 
 6. 수정한 코드를 Commit & Push
 
@@ -389,39 +423,40 @@
 5. Inline policy를 이용해서 해당 IAM Role에 SES SendEmail 권한 부여
 
 6. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
-  ```python
-  import json
-  import boto3
 
-  def lambda_handler(event, context):
-      #print("Received event: " + json.dumps(event, indent=2))
-      for record in event['Records']:
-          if (record['eventName'] == 'INSERT'):
-              email = record['dynamodb']['Keys']['email']['S']
+    ```python
+    import json
+    import boto3
 
-              client = boto3.client('ses', region_name='ap-southeast-2')
-              sesResponse = client.send_email(
-                  Destination={
-                      'ToAddresses': [email],
-                  },
-                  Message={
-                      'Body': {
-                          'Text': {
-                              'Charset': 'UTF-8',
-                              'Data': 'Registered',
-                          },
-                      },
-                      'Subject': {
-                          'Charset': 'UTF-8',
-                          'Data': 'Thank you',
-                      },
-                  },
-                  Source=email,
-              )
-              print (sesResponse)
-              print ("email sent")
-      return 'OK'
-  ```
+    def lambda_handler(event, context):
+        #print("Received event: " + json.dumps(event, indent=2))
+        for record in event['Records']:
+            if (record['eventName'] == 'INSERT'):
+                email = record['dynamodb']['Keys']['email']['S']
+
+                client = boto3.client('ses', region_name='ap-southeast-2')
+                sesResponse = client.send_email(
+                    Destination={
+                        'ToAddresses': [email],
+                    },
+                    Message={
+                        'Body': {
+                            'Text': {
+                                'Charset': 'UTF-8',
+                                'Data': 'Registered',
+                            },
+                        },
+                        'Subject': {
+                            'Charset': 'UTF-8',
+                            'Data': 'Thank you',
+                        },
+                    },
+                    Source=email,
+                )
+                print (sesResponse)
+                print ("email sent")
+        return 'OK'
+    ```
 
 7. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 DynamoDB를 검색하거나 **[Database]** 밑에 있는 **[DynamoDB]** 를 선택
 
@@ -444,43 +479,45 @@
 5. 좌측 상단에 있는 **Federated Identities** 선택 &rightarrow; **Identity pool name** = msa app &rightarrow; Authentication providers 탭 펼치기 &rightarrow; Cognito 탭 아래 **User Pool ID** , **App client id** 입력 &rightarrow; **[Create Pool]** &rightarrow; **[Allow]**
 
 6. Cloud9에서 src/config/cognito.js 파일을 열고 Cognito Endpoint 정보를 입력,
-  ```javascript
-  export default {
-    cognito: {
-      REGION: "ap-northeast-2",
-      USER_POOL_ID: "ap-northeast-2_xxxxx",
-      APP_CLIENT_ID: "xxxxxxx",
-      IDENTITY_POOL_ID: "ap-northeast-2:xxxx-xxxx-xxxxxxx"
-    }
-  };
-  ```
+
+    ```javascript
+    export default {
+      cognito: {
+        REGION: "ap-northeast-2",
+        USER_POOL_ID: "ap-northeast-2_xxxxx",
+        APP_CLIENT_ID: "xxxxxxx",
+        IDENTITY_POOL_ID: "ap-northeast-2:xxxx-xxxx-xxxxxxx"
+      }
+    };
+    ```
 
 7. Cloud9에서 src/components/sign-up/sign-up.component.jsx 파일을 열고 아래와 같이 38-54줄을 주석처리를 해제하고, 58줄 주석처리, 60줄 주석처리 해제
-  ```javascript
-  if(showVerification == false) {
 
-    const currentUser = await Auth.signUp({
-      username: email,
-      password: password
-    });
+    ```javascript
+    if(showVerification == false) {
 
-    this.setState({
-      displayName: displayName,
-      email: email,
-      password: password,
-      confirmPassword: confirmPassword,
-      verificationCode: verificationCode,
-      showVerification: true
-    });
-    return;
-  }
+      const currentUser = await Auth.signUp({
+        username: email,
+        password: password
+      });
 
-  try {
+      this.setState({
+        displayName: displayName,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        verificationCode: verificationCode,
+        showVerification: true
+      });
+      return;
+    }
 
-    // const currentUser = await user.register(email, password);
-    // console.log(verificationCode);
-    const currentUser = await Auth.confirmSignUp(email, verificationCode)
-  ```
+    try {
+
+      // const currentUser = await user.register(email, password);
+      // console.log(verificationCode);
+      const currentUser = await Auth.confirmSignUp(email, verificationCode)
+    ```
 
 8. 수정한 코드를 Commit & Push
 
@@ -489,7 +526,8 @@
 10. Cognito User Pool에 신규 유저가 생성됬는지 확인
 
 ## Container
-![](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/container.png)
+
+![Contaier](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/container.png)
 
 ### Docker Image 생성
 
@@ -498,30 +536,33 @@
 2. **[Get Started]** &rightarrow; **Repository name** = msa-node &rightarrow; **[Create repository]**
 
 3. Cloud9 에서 Node.js backend repository 복제
-  ```bash
-  cd ~/environment && git clone https://github.com/woowhoo/react-ecommerce-node.git
-  ```
+
+    ```bash
+    cd ~/environment && git clone https://github.com/woowhoo/react-ecommerce-node.git
+    ```
 
 4. Cloud9에서 react-ecommerce-node/config.js 파일을 열고 **DB_URL** = <RDS_ENDPOINT> 로 변경 (RDS Console에서 확인 가능)
-  ```javascript
-  module.exports = {
-    DB_URL: 'react-mysql.xxxxxxxx.ap-northeast-2.rds.amazonaws.com'
-  };
-  ```
+
+    ```javascript
+    module.exports = {
+      DB_URL: 'react-mysql.xxxxxxxx.ap-northeast-2.rds.amazonaws.com'
+    };
+    ```
 
 5. 복제한 Repository 루트 디렉토리에 Dockerfile 파일 생성후 아래 내용 복사
-  ```docker
-  FROM node:10
 
-  # Create app directory
-  WORKDIR /usr/src/app
+    ```docker
+    FROM node:10
 
-  # Bundle app source
-  COPY . .
+    # Create app directory
+    WORKDIR /usr/src/app
 
-  EXPOSE 5000
-  CMD [ "node", "app.js" ]
-  ```
+    # Bundle app source
+    COPY . .
+
+    EXPOSE 5000
+    CMD [ "node", "app.js" ]
+    ```
 
 6. ECR Dashboard 에서 위에서 만든 Repository 선택 &rightarrow; 우측 상단에 있는 **[View push commands]** 클릭
 
@@ -530,7 +571,8 @@
 8. ECR Dashboard를 refresh하고 Docker 이미지가 추가 됬는지 확인
 
 ### Fargate 구성
-![](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/fargate.png)
+
+![Fargate](https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/img/fargate.png)
 
 1. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 ECS를 검색하거나 **[Compute]** 밑에 있는 **[ECS]** 를 선택
 
@@ -560,15 +602,17 @@
 10. Task ID 클릭 &rightarrow; **Public IP**를 클립보드에 복사
 
 11. Cloud9 에서 React App 설정파일 수정 (API_SERVER)
-  ```javascript
-  const API_SERVER = 'http://<Public_IP>:5000'
-  ```
+
+    ```javascript
+    const API_SERVER = 'http://<Public_IP>:5000'
+    ```
 
 12. 수정한 코드를 Commit & Push
 
 13. EC2 인스턴스를 정지하고 앱이 정상적으로 작동하는지 확인
 
 ## Clean up
+
 1. ECS - Cluster, Task Definition, ECR Repository
 2. Cognito - Domain, User Pool, Identity Pool
 3. Lambda - event_handler, send_mail
