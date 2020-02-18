@@ -222,6 +222,40 @@
 
 20. 웹사이트에 접속후 Event 페이지로 이동 후 폼 작성 및 제출 &rightarrow; DynamoDB 테이블에 Record 추가 됐는지 확인 & 이벤트 접수 메일 왔는지 확인
 
+### X-Ray 구성
+
+1. Lambda Dashboard에서 **Layers** 클릭 &rightarrow; **[Create layer]** &rightarrow; **Name** = nodejs-xray-sdk, :radio_button: Upload a file from Amazon S3, Amazon S3 link URL = https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/node-xray-sdk.zip, Compatible runtimes = Node.js 10.x, Node.js 12.x &rightarrow; **[Create]**
+
+    - Layer 파일 생성 방법
+
+        ```bash
+        mkdir nodejs
+        cd nodejs
+        npm install aws-xray-sdk
+        zip node-xray-sdk.zip ../nodejs -r
+        ```
+
+2. 위에서 생성한 Lambda function으로 가서 **Layers** 선택 &rightarrow; **[Add a layer]** &rightarrow; **Name** = nodejs-xray-sdk, **Version** =1 &rightarrow; **[Add]** &rightarrow; Lambda function 저장
+
+3. Lambda 소스 코드를 아래와 같이 수정하고 **[Save]**
+
+    ```java
+    var AWSXRay = require('aws-xray-sdk');
+    var AWS = AWSXRay.captureAWS(require('aws-sdk'));
+
+    exports.handler = function(event, context, callback) {
+    ...
+    ...
+    ```
+
+4. 웹사이트에 접속후 Event 페이지로 이동 후 폼 작성 및 제출
+
+5. AWS Management Console에서 좌측 상단에 있는 **[Services]** 를 선택하고 검색창에서 X-Ray를 검색하거나 **[Developer Tools]** 밑에 있는 **[X-Ray]** 를 선택
+
+6. X-Ray Dashboard 에서 [Service Map] 선택후 서비스 Components 구성 확인
+
+7. **[Traces]** &rightarrow; **Trace list**에서 Trace를 선택하고 Segment별 실행시간 확인
+
 ## Scalable Frontend
 ### Static Website Hosting on S3
   - HTML, CSS, Javascript 및 기타 정적(Image, text) 파일로 구성된 정적 사이트 호스팅
