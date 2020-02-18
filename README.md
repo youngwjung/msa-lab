@@ -95,7 +95,7 @@
 
 8. Lambda Dashboard에서  **[Create function]** 클릭후,
   **Function name** = event_handler,
-  **Runtime** = Python 3.7,
+  **Runtime** = Node.js 12.x,
   **[Create function]** 클릭
 
 9. 좌측 하단에 있는 **[Execution role]** 에서 **View the event_handler-role-xxxx** on the IAM console 를 선택
@@ -120,49 +120,72 @@
 11. Lambda Console로 돌아와서 우측 하단에 있는 **[AWS X-Ray]** 에서 :white_check_mark: **Active tracing** Specific &rightarrow; **[Save]** 클릭
 
 12. 아래 코드블록을 Lambda에 복사 후, **[Save]** 클릭
-  ```python
-  import json
-  import boto3
 
-  def lambda_handler(event, context):
+    ```java
+    var AWS = require('aws-sdk')
 
-      dynamodb = boto3.resource('dynamodb')
-      table = dynamodb.Table('event')
-
-      response = table.put_item(
-          Item=event    
-      )
-      if (response['ResponseMetadata']['HTTPStatusCode'] == 200):
-          print ("successful")
-          client = boto3.client('ses', region_name='ap-southeast-2')
-
-          sesResponse = client.send_email(
-              Destination={
-                  'ToAddresses': [event['email']],
-              },
-              Message={
-                  'Body': {
-                      'Text': {
-                          'Charset': 'UTF-8',
-                          'Data': 'Registered',
-                      },
-                  },
-                  'Subject': {
-                      'Charset': 'UTF-8',
-                      'Data': 'Thank you',
-                  },
-              },
-              Source=event['email'],
-          )
-
-          print (sesResponse)
-          print ("email sent")
-
-      return {
-          'statusCode': 200,
-          'body': json.dumps(response)
-      }
-  ```
+    exports.handler = function(event, context, callback) {
+        
+        var dynamodb = new AWS.DynamoDB()
+        
+        var dynamodbParams = {
+            Item: {
+                'email': {
+                    S: event.email
+                },
+                'name': {
+                    S: event.name
+                },
+                'mobile': {
+                    S: event.mobile
+                }
+            }, 
+            TableName: 'event'
+        }
+        
+        dynamodb.putItem(dynamodbParams, function(err, data) {
+            if (err) {
+                console.log(err, err.stack)
+            } else {
+                var ses = new AWS.SES({region: 'ap-southeast-2'})
+                
+                var sesParams = {
+                    Destination: {
+                        ToAddresses: [event['email']],
+                    },
+                    Message: {
+                        Body: {
+                            Text: {
+                                Charset: 'UTF-8',
+                                Data: 'Registered',
+                            },
+                        },
+                        Subject: {
+                            Charset: 'UTF-8',
+                            Data: 'Thank you',
+                        },
+                    },
+                    Source: event['email'],
+                }
+                
+                ses.sendEmail(sesParams, function(err, data) {
+                    if (err) {
+                        console.log(err, err.stack)
+                    } else {
+                        console.log(data)       
+                    }
+                })
+            }
+        })
+        
+        const response = {
+            statusCode: 200,
+            body: JSON.stringify('OK'),
+        }
+        
+        callback(null, response)
+    }
+    ```
 
 13. Lambda Console로 돌아가서 **[Designer]** 섹션에 있는 **+ Add trigger** 클릭 &rightarrow; Dropdown 리스트에서 **API Gateway** 선택 &rightarrow; **API** = Create a new API, **Security** = Open &rightarrow; **[Add]** 클릭
 
