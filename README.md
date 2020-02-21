@@ -246,7 +246,7 @@
 
 20. 웹사이트에 접속후 Event 페이지로 이동 후 폼 작성 및 제출 &rightarrow; DynamoDB 테이블에 Record 추가 됐는지 확인 & 이벤트 접수 메일 왔는지 확인
 
-### X-Ray 구성
+### APM with X-Ray
 
 1. Lambda Dashboard에서 **Layers** 클릭 &rightarrow; **[Create layer]** &rightarrow; **Name** = nodejs-xray-sdk, :radio_button: Upload a file from Amazon S3, Amazon S3 link URL = `https://saltware-aws-lab.s3.ap-northeast-2.amazonaws.com/msa/node-xray-sdk.zip` Compatible runtimes = Node.js 10.x, Node.js 12.x &rightarrow; **[Create]**
 
